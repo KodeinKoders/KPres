@@ -2,6 +2,7 @@ package org.kodein.kpres.utils
 
 import org.w3c.dom.HTMLElement
 
+@Suppress("unused")
 external interface HighlightJs {
     interface BaseHighlightResult {
         val language: String

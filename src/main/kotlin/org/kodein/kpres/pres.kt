@@ -1,6 +1,7 @@
 package org.kodein.kpres
 
 import kotlinext.js.jsObject
+import kotlinx.browser.window
 import kotlinx.css.*
 import kotlinx.css.properties.*
 import kotlinx.html.tabIndex
@@ -17,7 +18,6 @@ import react.router.dom.route
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styledDiv
-import kotlin.browser.window
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -387,7 +387,7 @@ private val anticipate = functionalComponent<PresentationProps> { props ->
     }
 
     useEffectWithCleanup {
-        val listener = { e: Event -> update() }
+        val listener = { _: Event -> update() }
         window.addEventListener("resize", listener)
 
         ({ window.removeEventListener("resize", listener) })
@@ -478,6 +478,7 @@ private interface RouteProps: RProps {
     val state: String?
 }
 
+@Suppress("unused")
 fun RBuilder.presentation(
         defaultTransition: Transition.Set = Fade,
         transitionDuration: Int = 500,

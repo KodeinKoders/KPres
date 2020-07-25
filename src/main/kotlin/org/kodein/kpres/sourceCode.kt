@@ -1,18 +1,20 @@
 package org.kodein.kpres
 
+import kotlinx.browser.document
 import kotlinx.css.RuleSet
 import kotlinx.html.Entities
 import kotlinx.html.classes
 import kotlinx.html.unsafe
 import org.kodein.kpres.utils.getValue
 import org.kodein.kpres.utils.hljs
-import org.w3c.dom.*
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.Node
+import org.w3c.dom.Text
+import org.w3c.dom.asList
 import react.*
 import react.dom.code
-import react.dom.span
 import styled.css
 import styled.styledPre
-import kotlin.browser.document
 
 
 data class SourceCodeProps(
@@ -61,6 +63,7 @@ private val SourceCode by functionalComponent<SourceCodeProps> { props ->
     }
 }
 
+@Suppress("unused")
 fun RBuilder.sourceCode(lang: String, code: String, onHighlight: () -> Unit = {}, style: RuleSet = {}) = child(
         component = SourceCode,
         props = SourceCodeProps(lang, code, onHighlight, style)

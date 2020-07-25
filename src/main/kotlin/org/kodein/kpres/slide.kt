@@ -1,5 +1,6 @@
 package org.kodein.kpres
 
+import kotlinx.browser.window
 import kotlinx.css.*
 import kotlinx.html.classes
 import org.kodein.kpres.utils.getValue
@@ -11,7 +12,6 @@ import react.useEffectWithCleanup
 import react.useRef
 import styled.css
 import styled.styledDiv
-import kotlin.browser.window
 import kotlin.math.min
 
 
@@ -20,6 +20,7 @@ internal interface FullSlideProps : RProps {
     var style: CSSBuilder.(Int) -> Unit
 }
 
+@Suppress("unused")
 class SlideContentProps(val state: Int, val shouldAnim: Boolean) : RProps
 
 internal val Slide by functionalComponent<FullSlideProps> { props ->
