@@ -1,6 +1,5 @@
 package org.kodein.kpres
 
-import kotlinx.browser.document
 import kotlinx.css.RuleSet
 import kotlinx.html.Entities
 import kotlinx.html.classes
@@ -15,6 +14,7 @@ import react.*
 import react.dom.code
 import styled.css
 import styled.styledPre
+import kotlin.browser.document
 
 
 data class SourceCodeProps(

@@ -1,10 +1,10 @@
 plugins {
-    kotlin("js") version "1.4.0-rc"
+    kotlin("js") version "1.3.72"
     `maven-publish`
 }
 
 group = "net.kodein.kpres"
-version = "1.0.0-kotlin-1.4.0-rc"
+version = "1.0.0"
 
 repositories {
     jcenter()
@@ -13,7 +13,7 @@ repositories {
 }
 
 kotlin {
-    js {
+    target {
         browser {}
         useCommonJs()
     }
@@ -24,11 +24,14 @@ dependencies {
 
     val reactVersion = "16.13.1"
     val reactRouterVersion = "5.1.2"
-    val kotlinWrapperVersion = "pre.109-kotlin-1.4.0-rc"
+    val kotlinWrapperVersion = "pre.110-kotlin-1.3.72"
 
     api("org.jetbrains:kotlin-react-dom:$reactVersion-$kotlinWrapperVersion")
     api("org.jetbrains:kotlin-react-router-dom:$reactRouterVersion-$kotlinWrapperVersion")
     api("org.jetbrains:kotlin-styled:1.0.0-$kotlinWrapperVersion")
+
+    api(npm("highlight.js", "^10.1.2"))
+    api(npm("react-markdown", "^4.3.1"))
 }
 
 publishing {
