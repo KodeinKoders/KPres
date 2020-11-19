@@ -21,7 +21,7 @@ internal interface FullSlideProps : RProps {
 }
 
 @Suppress("unused")
-class SlideContentProps(val state: Int, val shouldAnim: Boolean) : RProps
+open class SlideContentProps(val state: Int, val shouldAnim: Boolean) : RProps
 
 internal val Slide by functionalComponent<FullSlideProps> { props ->
     val outer = useRef<HTMLDivElement?>(null)
