@@ -14,7 +14,7 @@ import react.*
 import react.dom.code
 import styled.css
 import styled.styledPre
-import kotlin.browser.document
+import kotlinx.browser.document
 
 
 data class SourceCodeProps(

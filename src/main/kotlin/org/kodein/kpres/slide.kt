@@ -11,7 +11,7 @@ import react.useEffectWithCleanup
 import react.useRef
 import styled.css
 import styled.styledDiv
-import kotlin.browser.window
+import kotlinx.browser.window
 import kotlin.math.min
 
 

@@ -17,7 +17,7 @@ import react.router.dom.route
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styledDiv
-import kotlin.browser.window
+import kotlinx.browser.window
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min

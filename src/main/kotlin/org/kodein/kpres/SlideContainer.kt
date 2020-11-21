@@ -5,7 +5,7 @@ import org.kodein.kpres.utils.getValue
 import react.*
 import styled.css
 import styled.styledDiv
-import kotlin.browser.window
+import kotlinx.browser.window
 
 private fun useTransitionState(getTransitionDuration: (Boolean) -> Int, getTransition: (Boolean) -> Transition): Pair<TransitionState?, (Boolean) -> Unit> {
     var transitionState by useState<TransitionState?>(null)
