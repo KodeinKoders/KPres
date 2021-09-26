@@ -1,6 +1,7 @@
 package org.kodein.kpres
 
 import kotlinext.js.jsObject
+import kotlinx.browser.window
 import kotlinx.css.*
 import kotlinx.css.properties.*
 import kotlinx.html.tabIndex
@@ -12,12 +13,11 @@ import org.w3c.dom.events.Event
 import org.w3c.dom.url.URLSearchParams
 import react.*
 import react.dom.h1
-import react.router.dom.hashRouter
-import react.router.dom.route
+import react.router.dom.*
+import react.router.dom.RouteProps
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styledDiv
-import kotlinx.browser.window
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -27,8 +27,8 @@ typealias SlideHandler = RBuilder.(SlideContentProps) -> Unit
 
 internal data class SlideInfos(
         val stateCount: Int,
-        val style: CSSBuilder.(Int) -> Unit,
-        val containerStyle: CSSBuilder.(Int) -> Unit,
+        val style: CssBuilder.(Int) -> Unit,
+        val containerStyle: CssBuilder.(Int) -> Unit,
         val inTransitions: Transition.Set?,
         val outTransitions: Transition.Set?,
         val inTransitionDuration: Int?,
@@ -46,7 +46,7 @@ internal enum class Mode {
     ANTICIPATE
 }
 
-private fun Set<Mode>.params() = if (isEmpty()) "" else "mode=" + joinToString(separator = ",") { it.name.toLowerCase() }
+private fun Set<Mode>.params() = if (isEmpty()) "" else "mode=" + joinToString(separator = ",") { it.name.lowercase() }
 
 internal data class SlidePosition(val slide: Int, val state: Int)
 
@@ -69,7 +69,7 @@ internal class PresentationProps(
         val defaultTransitions: Transition.Set,
         val defaultTransitionDuration: Int,
         val modes: Set<Mode>
-) : RProps
+) : Props
 
 internal fun PresentationProps.slideInfos(index: SlidePosition) = slides[index.slide].first
 internal fun PresentationProps.transitionSet(index: SlidePosition, select: SlideInfos.() -> Transition.Set?) = slideInfos(index).select() ?: defaultTransitions
@@ -111,7 +111,7 @@ private fun RBuilder.slide(props: PresentationProps, position: SlidePosition, tr
         val slidePair = position.slide.takeIf { it >= 0 } ?.let { props.slides[it] }
         if (slidePair != null) {
             val (slideInfos, slideHandler) = slidePair
-            child(component = Slide, props = jsObject { this.state = position.state ; this.style = slideInfos.style }) {
+            child(type = Slide, props = jsObject { this.state = position.state ; this.style = slideInfos.style }) {
                 val shouldAnim = transitionState == null
                         || (transitionState.forward && position.state != 0)
                         || (!transitionState.forward && position.state != slideInfos.stateCount - 1)
@@ -122,9 +122,10 @@ private fun RBuilder.slide(props: PresentationProps, position: SlidePosition, tr
 }
 
 
-private val Presentation by functionalComponent<PresentationProps> { props ->
-    val containerDiv = useRef<HTMLDivElement?>(null)
-    useEffect(emptyList()) {
+private val Presentation by functionComponent<PresentationProps> { props ->
+    val containerDiv = useRef<HTMLDivElement>(null)
+
+    useEffect {
         containerDiv.current!!.focus()
     }
 
@@ -132,7 +133,7 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
 
     var noBroadcast by useState(false)
 
-    useEffectWithCleanup {
+    useEffect {
         channel.onmessage = {
             val newPos = it.data.unsafeCast<SlidePosition>()
             if (props.position != newPos) {
@@ -141,7 +142,7 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
             }
             Unit
         }
-        ({ channel.onmessage = null })
+       cleanup { channel.onmessage = null }
     }
 
     useEffect(listOf(props.position.slide, props.position.state)) {
@@ -215,7 +216,7 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
                 for (i in max(0, props.position.slide - 2)..min(props.slides.lastIndex, props.position.slide + 2)) {
                     val infos = props.slides[i].first
                     child(
-                            component = slideContainer,
+                            type = slideContainer,
                             props = SlideContainerProps(
                                     presProps = props,
                                     position = when {
@@ -285,9 +286,9 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
     }
 }
 
-private val presenter = functionalComponent<PresentationProps> { props ->
+private val presenter by functionComponent<PresentationProps> { props ->
     child(
-            component = slideContainer,
+            type = slideContainer,
             props = SlideContainerProps(
                     presProps = props,
                     position = props.position,
@@ -316,7 +317,7 @@ private val presenter = functionalComponent<PresentationProps> { props ->
     }
     val nextPosition = props.getNextPosition()
     child(
-            component = slideContainer,
+            type = slideContainer,
             props = SlideContainerProps(
                     presProps = props,
                     position = nextPosition,
@@ -362,9 +363,9 @@ private val presenter = functionalComponent<PresentationProps> { props ->
     }
 }
 
-private val anticipate = functionalComponent<PresentationProps> { props ->
-    val current = useRef<HTMLElement?>(null)
-    val next = useRef<HTMLElement?>(null)
+private val anticipate by functionComponent<PresentationProps> { props ->
+    val current = useRef<HTMLElement>(null)
+    val next = useRef<HTMLElement>(null)
 
     fun update() {
         val windowWidth = window.innerWidth.toDouble()
@@ -386,14 +387,14 @@ private val anticipate = functionalComponent<PresentationProps> { props ->
         }
     }
 
-    useEffectWithCleanup {
+    useEffect {
         val listener = { _: Event -> update() }
         window.addEventListener("resize", listener)
 
-        ({ window.removeEventListener("resize", listener) })
+        cleanup { window.removeEventListener("resize", listener) }
     }
 
-    useEffect(emptyList()) { update() }
+    useEffect { update() }
 
     styledDiv {
         css {
@@ -402,7 +403,7 @@ private val anticipate = functionalComponent<PresentationProps> { props ->
         }
         ref = current
         child(
-                component = slideContainer,
+                type = slideContainer,
                 props = SlideContainerProps(
                         presProps = props,
                         position = props.position,
@@ -435,7 +436,7 @@ private val anticipate = functionalComponent<PresentationProps> { props ->
         ref = next
         val nextPosition = props.getNextPosition()
         child(
-                component = slideContainer,
+                type = slideContainer,
                 props = SlideContainerProps(
                         presProps = props,
                         position = nextPosition,
@@ -462,8 +463,8 @@ private val anticipate = functionalComponent<PresentationProps> { props ->
 interface PresentationBuilder {
     fun slide(
         stateCount: Int = 1,
-        style: CSSBuilder.(Int) -> Unit = {},
-        containerStyle: CSSBuilder.(Int) -> Unit = {},
+        style: CssBuilder.(Int) -> Unit = {},
+        containerStyle: CssBuilder.(Int) -> Unit = {},
         inTransitions: Transition.Set? = null,
         outTransitions: Transition.Set? = null,
         inTransitionDuration: Int? = null,
@@ -473,9 +474,9 @@ interface PresentationBuilder {
     )
 }
 
-private interface RouteProps: RProps {
-    val slide: String?
-    val state: String?
+private external interface RouteProps: RouteComponentProps {
+    var slide: String?
+    var state: String?
 }
 
 @Suppress("unused")
@@ -488,8 +489,8 @@ fun RBuilder.presentation(
     object : PresentationBuilder {
         override fun slide(
             stateCount: Int,
-            style: CSSBuilder.(Int) -> Unit,
-            containerStyle: CSSBuilder.(Int) -> Unit,
+            style: CssBuilder.(Int) -> Unit,
+            containerStyle: CssBuilder.(Int) -> Unit,
             inTransitions: Transition.Set?,
             outTransitions: Transition.Set?,
             inTransitionDuration: Int?,
@@ -516,7 +517,7 @@ fun RBuilder.presentation(
                     ?.mapNotNull { try { Mode.valueOf(it.toUpperCase()) } catch (_: Throwable) { null } }
                     ?.toSet()
                     ?: emptySet()
-            child(component = Presentation, props = PresentationProps(slides, SlidePosition(slide, state), defaultTransition, transitionDuration, modes))
+            child(type = Presentation, props = PresentationProps(slides, SlidePosition(slide, state), defaultTransition, transitionDuration, modes))
         }
     }
 }

@@ -22,7 +22,7 @@ data class SourceCodeProps(
         val code: String,
         val onHighlight: () -> Unit,
         val style: RuleSet
-): RProps
+): Props
 
 
 private fun wrap(n: Int, e: Node) {
@@ -38,9 +38,9 @@ private fun wrap(n: Int, e: Node) {
     }
 }
 
-private val SourceCode by functionalComponent<SourceCodeProps> { props ->
+private val SourceCode by functionComponent<SourceCodeProps> { props ->
 
-    val code = useRef<HTMLElement?>(null)
+    val code = useRef<HTMLElement>(null)
     useEffect(listOf(props.lang, props.code)) {
         hljs.highlightBlock(code.current!!)
         props.onHighlight()
@@ -65,6 +65,6 @@ private val SourceCode by functionalComponent<SourceCodeProps> { props ->
 
 @Suppress("unused")
 fun RBuilder.sourceCode(lang: String, code: String, onHighlight: () -> Unit = {}, style: RuleSet = {}) = child(
-        component = SourceCode,
+        type = SourceCode,
         props = SourceCodeProps(lang, code, onHighlight, style)
 )

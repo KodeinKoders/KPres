@@ -1,36 +1,40 @@
 plugins {
-    kotlin("js") version "1.4.10"
+    kotlin("js") version "1.5.31"
     `maven-publish`
 }
 
 group = "net.kodein.kpres"
-version = "1.1.0"
+version = "2.0.0"
 
 repositories {
-    jcenter()
-    maven( url = "https://kotlin.bintray.com/kotlin-js-wrappers")
-    maven("https://dl.bintray.com/kotlin/kotlin-eap")
+    mavenCentral()
 }
 
 kotlin {
-    js {
-        browser {}
+    js(IR) {
+        browser {
+            commonWebpackConfig {
+                cssSupport.enabled = true
+            }
+        }
         useCommonJs()
+        binaries.executable()
     }
 }
 
 dependencies {
-    val reactVersion = "17.0.0"
+    val reactVersion = "17.0.2"
     val reactRouterVersion = "5.2.0"
-    val styledVersion = "5.2.0"
-    val kotlinWrapperVersion = "pre.129-kotlin-1.4.10"
+    val styledVersion = "5.3.1"
+    val kotlinWrapperVersion = "pre.248-kotlin-1.5.31"
 
-    api("org.jetbrains:kotlin-react-dom:$reactVersion-$kotlinWrapperVersion")
-    api("org.jetbrains:kotlin-react-router-dom:$reactRouterVersion-$kotlinWrapperVersion")
-    api("org.jetbrains:kotlin-styled:$styledVersion-$kotlinWrapperVersion")
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-react:$reactVersion-$kotlinWrapperVersion")
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:$reactVersion-$kotlinWrapperVersion")
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-react-router-dom:$reactRouterVersion-$kotlinWrapperVersion")
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$styledVersion-$kotlinWrapperVersion")
 
-    api(npm("highlight.js", "^10.3.2"))
-    api(npm("react-markdown", "^5.0.2"))
+    api(npm("highlight.js", "^11.2.0"))
+    api(npm("react-markdown", "7.0.0"))
 }
 
 publishing {

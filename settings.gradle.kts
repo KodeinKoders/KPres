@@ -2,10 +2,8 @@ rootProject.name = "kpres"
 
 pluginManagement {
     repositories {
-        maven("https://dl.bintray.com/kotlin/kotlin-eap")
-        gradlePluginPortal()
-        jcenter()
         mavenCentral()
+        gradlePluginPortal()
         maven("https://plugins.gradle.org/m2/")
     }
 }

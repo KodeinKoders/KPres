@@ -1,18 +1,17 @@
 package org.kodein.kpres
 
 import kotlinx.css.*
-import org.kodein.kpres.utils.getValue
 import react.*
 import styled.css
 import styled.styledDiv
 import kotlinx.browser.window
+import org.kodein.kpres.utils.getValue
 
 private fun useTransitionState(getTransitionDuration: (Boolean) -> Int, getTransition: (Boolean) -> Transition): Pair<TransitionState?, (Boolean) -> Unit> {
     var transitionState by useState<TransitionState?>(null)
 
-    useEffectWithCleanup(listOf(transitionState)) {
-        val state = transitionState
-        val timerId = when (state) {
+    useEffect(listOf(transitionState)) {
+        val timerId = when (val state = transitionState) {
             is TransitionState.Prepare -> {
                 val transitionDuration = getTransitionDuration(state.forward)
                 val stateDuration = getTransition(state.forward).stateDuration(transitionDuration, 0).takeIf { it in 0..transitionDuration } ?: transitionDuration
@@ -29,15 +28,21 @@ private fun useTransitionState(getTransitionDuration: (Boolean) -> Int, getTrans
             }
             null -> null
         }
-        if (timerId != null) ({ window.clearTimeout(timerId) })
-        else ({})
+
+        if (timerId != null) cleanup { window.clearTimeout(timerId) }
     }
 
     return transitionState to { forward: Boolean -> transitionState = TransitionState.Prepare(forward) }
 }
 
-internal class SlideContainerProps(val presProps: PresentationProps, val position: SlidePosition, val style: CSSBuilder.() -> Unit, val render: RBuilder.(SlideRender) -> Unit) : RProps
-internal val slideContainer by functionalComponent<SlideContainerProps> { props ->
+internal class SlideContainerProps(
+    val presProps: PresentationProps,
+    val position: SlidePosition,
+    val style: CssBuilder.() -> Unit,
+    val render: RBuilder.(SlideRender) -> Unit,
+) : Props
+
+internal val slideContainer by functionComponent<SlideContainerProps> { props ->
     var currentPosition by useState(props.position)
     var previousPosition by useState(SlidePosition(0, 0))
 
@@ -65,7 +70,7 @@ internal val slideContainer by functionalComponent<SlideContainerProps> { props 
             width = 100.pct
             height = 100.pct
             overflow = Overflow.hidden
-            (props.style)()
+            props.style(this)
         }
 
         styledDiv {
@@ -76,7 +81,7 @@ internal val slideContainer by functionalComponent<SlideContainerProps> { props 
                 position = Position.relative
             }
 
-            (props.render)(SlideRender(currentPosition, previousPosition, appearState, disappearState))
+            props.render(this, SlideRender(currentPosition, previousPosition, appearState, disappearState))
         }
     }
 }

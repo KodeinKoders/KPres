@@ -3,17 +3,17 @@
 package org.kodein.kpres
 
 import kotlinx.css.opacity
-import react.RClass
-import react.RProps
-import react.dom.WithClassName
+import react.ComponentClass
+import react.Props
+import react.PropsWithClassName
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styled
 
-external interface MarkdownProps : RProps, WithClassName
+external interface MarkdownProps : Props, PropsWithClassName
 
 @JsModule("react-markdown")
-external val Markdown: RClass<MarkdownProps>
+external val Markdown: ComponentClass<MarkdownProps>
 
 fun notes(str: String): StyledDOMBuilder<*>.(Int) -> Unit {
     return { _ ->

@@ -1,40 +1,37 @@
 package org.kodein.kpres
 
+import kotlinx.browser.window
 import kotlinx.css.*
 import kotlinx.html.classes
 import org.kodein.kpres.utils.getValue
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.Event
-import react.RProps
-import react.functionalComponent
-import react.useEffectWithCleanup
-import react.useRef
+import react.*
 import styled.css
 import styled.styledDiv
-import kotlinx.browser.window
 import kotlin.math.min
 
 
-internal interface FullSlideProps : RProps {
+internal external interface FullSlideProps : PropsWithChildren {
     var state: Int
-    var style: CSSBuilder.(Int) -> Unit
+    var style: (CssBuilder, Int) -> Unit
 }
 
 @Suppress("unused")
-open class SlideContentProps(val state: Int, val shouldAnim: Boolean) : RProps
+open class SlideContentProps(val state: Int, val shouldAnim: Boolean) : Props
 
-internal val Slide by functionalComponent<FullSlideProps> { props ->
-    val outer = useRef<HTMLDivElement?>(null)
-    val inner = useRef<HTMLDivElement?>(null)
+internal val Slide by functionComponent<FullSlideProps> { props ->
+    val outer = useRef<HTMLDivElement>(null)
+    val inner = useRef<HTMLDivElement>(null)
 
-    useEffectWithCleanup {
+    useEffect {
         val listener = { _: Event? ->
             val factor = min(outer.current!!.offsetWidth.toDouble() / 1024.0, outer.current!!.offsetHeight.toDouble() / 640.0).takeIf { it > 1.0 } ?: 1.0
             inner.current!!.style.transform = "scale(${factor})"
         }
         listener(null)
         window.addEventListener("resize", listener)
-        ({ window.removeEventListener("resize", listener) })
+        cleanup { window.removeEventListener("resize", listener) }
     }
 
     styledDiv {
